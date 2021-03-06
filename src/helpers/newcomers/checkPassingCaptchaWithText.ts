@@ -38,12 +38,10 @@ export async function checkPassingCaptchaWithText(ctx, next) {
   // Check if it is digits captcha
   if (candidate.captchaType === CaptchaType.DIGITS) {
     // Check the format
-    const hasCorrectAnswer = ctx.message.text.includes(
+    const hasCorrectAnswer = ctx.message.text.toLowercase().includes(
       candidate.equationAnswer as string
     )
-    const hasNoMoreThanTwoDigits =
-      (ctx.message.text.match(/\d/g) || []).length <= 2
-    if (!hasCorrectAnswer || !hasNoMoreThanTwoDigits) {
+    if (!hasCorrectAnswer) {
       if (ctx.dbchat.strict) {
         deleteMessageSafe(ctx)
       }

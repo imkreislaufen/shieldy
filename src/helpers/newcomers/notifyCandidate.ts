@@ -9,14 +9,6 @@ import { getLink, getName, getUsername } from '@helpers/getUsername'
 import { isRuChat } from '@helpers/isRuChat'
 import { isOver10000 } from '@helpers/goldenBorodutchSubCount'
 
-const promoAdditions = {
-  ru: () =>
-    isOver10000()
-      ? 'При поддержке <a href="https://todorant.com/?utm_source=shieldy">Тудуранта</a>'
-      : 'При поддержке <a href="https://t.me/golden_borodutch">Золота Бородача</a>',
-  en: () =>
-    'Powered by <a href="https://todorant.com/?utm_source=shieldy">Todorant</a>',
-}
 const promoExceptions = [
   -1001007166727,
 
@@ -94,10 +86,6 @@ export async function notifyCandidate(
         messageToSend.text,
         messageToSend.entities
       )
-      if (!promoExceptions.includes(ctx.chat.id)) {
-        const promoAddition = promoAdditions[isRuChat(chat) ? 'ru' : 'en']()
-        formattedText = `${formattedText}\n${promoAddition}`
-      }
       if (image) {
         return ctx.replyWithPhoto({ source: image.png } as any, {
           caption: formattedText,
@@ -116,10 +104,9 @@ export async function notifyCandidate(
         message.text,
         message.entities
       )
-      const promoAddition = promoAdditions[isRuChat(chat) ? 'ru' : 'en']()
       message.text = promoExceptions.includes(ctx.chat.id)
         ? `${getUsername(candidate)}\n\n${formattedText}`
-        : `${getUsername(candidate)}\n\n${formattedText}\n${promoAddition}`
+        : `${getUsername(candidate)}\n\n${formattedText}`
       try {
         const sentMessage = await ctx.telegram.sendCopy(
           chat.id,
@@ -139,7 +126,6 @@ export async function notifyCandidate(
     }
   } else {
     if (image) {
-      const promoAddition = promoAdditions[isRuChat(chat) ? 'ru' : 'en']()
       return ctx.replyWithPhoto({ source: image.png } as any, {
         caption: promoExceptions.includes(ctx.chat.id)
           ? `<a href="tg://user?id=${candidate.id}">${getUsername(
@@ -153,11 +139,10 @@ export async function notifyCandidate(
             )}</a>${warningMessage} (${chat.timeGiven} ${strings(
               chat,
               'seconds'
-            )})\n${promoAddition}`,
+            )})`,
         parse_mode: 'HTML',
       })
     } else {
-      const promoAddition = promoAdditions[isRuChat(chat) ? 'ru' : 'en']()
       return ctx.replyWithMarkdown(
         promoExceptions.includes(ctx.chat.id)
           ? `${
@@ -179,7 +164,7 @@ export async function notifyCandidate(
             )}</a>${warningMessage} (${chat.timeGiven} ${strings(
               chat,
               'seconds'
-            )})\n${promoAddition}`,
+            )})`,
         extra
       )
     }
